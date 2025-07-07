@@ -16,5 +16,4 @@ services:
       - path: /
     envs:
       - key: DATABASE_URL
-        value: "<your_database_url>"
-      # Add other environment variables as needed
+        value: <your_database_url>
