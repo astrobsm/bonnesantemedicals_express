@@ -1,0 +1,22 @@
+@echo off
+REM === Backend Tests ===
+cd AstroBSM-Oracle-IVANSTAMAS\backend
+
+REM Install backend test dependencies if needed
+pip install -r requirements.txt
+pip install pytest requests
+
+echo Running backend tests...
+pytest test_full_api.py
+
+cd ..\..\frontend\react-app
+
+REM Install frontend dependencies if needed
+call npm install
+
+echo Running frontend tests...
+call npm test -- --watchAll=false
+
+cd ..\..\..
+echo All tests completed.
+pause

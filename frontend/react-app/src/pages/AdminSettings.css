@@ -1,0 +1,38 @@
+.admin-settings-container {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.admin-settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+  padding: 2rem 2.5rem;
+}
+
+.admin-settings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 0.7rem;
+}
+
+.admin-settings-key {
+  font-weight: 600;
+  color: #34495e;
+  font-size: 1.1rem;
+}
+
+.admin-settings-value {
+  color: #1abc9c;
+  font-size: 1.1rem;
+}
+
+.error {
+  color: #e74c3c;
+  font-weight: 500;
+}

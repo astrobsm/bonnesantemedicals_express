@@ -1,0 +1,22 @@
+# Render build and migration automation
+# Add this to your render.yaml or as a build command in Render dashboard
+# This ensures migrations run automatically on deploy
+
+services:
+  - type: web
+    name: astrobsm-backend
+    runtime: python
+    buildCommand: |
+      pip install -r requirements.txt
+      alembic upgrade head
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: astrobsm-db
+          property: connectionString
+  - type: web
+    name: astrobsm-frontend
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start

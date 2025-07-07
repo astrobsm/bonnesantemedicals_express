@@ -1,0 +1,17 @@
+.new-page-container {
+    text-align: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    color: #333;
+    font-family: Arial, sans-serif;
+}
+
+.new-page-container h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.new-page-container p {
+    font-size: 1.2em;
+    line-height: 1.6;
+}

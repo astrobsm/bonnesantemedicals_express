@@ -1,0 +1,144 @@
+.device-fault-reporting-container {
+    text-align: center;
+    padding: 20px;
+    background-color: #f0f8ff;
+    color: #333;
+    font-family: Arial, sans-serif;
+}
+
+.device-fault-reporting-container h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.awesome-button {
+    font-size: 1.2em;
+    padding: 10px 20px;
+    color: white;
+    background: linear-gradient(145deg, #1e90ff, #4682b4);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.awesome-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.4), -6px -6px 15px rgba(255, 255, 255, 0.4);
+}
+
+.fault-reporting-container {
+    padding: 20px;
+    background: #f9f9f9;
+    min-height: 100vh;
+}
+
+.fault-reporting-container h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.fault-reporting-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: linear-gradient(145deg, #ffffff, #e6e6e6);
+    border-radius: 10px;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.7);
+    padding: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.fault-reporting-form label {
+    display: block;
+    margin-bottom: 15px;
+    color: #555;
+    font-weight: bold;
+}
+
+.fault-reporting-form input,
+.fault-reporting-form select,
+.fault-reporting-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.7);
+}
+
+.fault-reporting-form textarea {
+    resize: none;
+    height: 100px;
+}
+
+.submit-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(145deg, #ff4500, #ff6347);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2), -2px -2px 5px rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.submit-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive tweaks for mobile and tablet */
+@media (max-width: 900px) {
+  .container, .main, .page-container, [class*="container"] {
+    max-width: 100vw !important;
+    padding: 10px !important;
+    box-sizing: border-box;
+  }
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s;
+  }
+  .sidebar.open {
+    left: 0;
+  }
+  .sidebar-toggle {
+    display: block;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1100;
+    background: #228b22;
+    color: #fff;
+    border: none;
+    font-size: 2rem;
+    border-radius: 5px;
+    padding: 5px 10px;
+  }
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 999;
+  }
+}
+@media (max-width: 600px) {
+  h1, .header-title {
+    font-size: 1.5rem !important;
+  }
+  .container, .main, .page-container, [class*="container"] {
+    padding: 5px !important;
+    font-size: 1rem !important;
+  }
+}

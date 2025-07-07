@@ -1,0 +1,95 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f8ff;
+    margin: 0;
+    padding: 0;
+}
+
+.timed-attendance-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid navy;
+}
+
+.timed-attendance-container h1 {
+    text-align: center;
+    color: navy;
+}
+
+.attendance-buttons button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: navy;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.attendance-buttons button:hover {
+    background-color: skyblue;
+}
+
+.message {
+    text-align: center;
+    color: green;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+/* Responsive tweaks for mobile and tablet */
+@media (max-width: 900px) {
+  .container, .main, .page-container, [class*="container"] {
+    max-width: 100vw !important;
+    padding: 10px !important;
+    box-sizing: border-box;
+  }
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s;
+  }
+  .sidebar.open {
+    left: 0;
+  }
+  .sidebar-toggle {
+    display: block;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1100;
+    background: #228b22;
+    color: #fff;
+    border: none;
+    font-size: 2rem;
+    border-radius: 5px;
+    padding: 5px 10px;
+  }
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 999;
+  }
+}
+@media (max-width: 600px) {
+  h1, .header-title {
+    font-size: 1.5rem !important;
+  }
+  .container, .main, .page-container, [class*="container"] {
+    padding: 5px !important;
+    font-size: 1rem !important;
+  }
+}

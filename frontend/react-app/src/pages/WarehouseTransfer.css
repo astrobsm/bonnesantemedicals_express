@@ -1,0 +1,43 @@
+.warehouse-transfer-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.warehouse-transfer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.warehouse-transfer-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+}
+.warehouse-transfer-form select,
+.warehouse-transfer-form input[type="number"] {
+  margin-top: 4px;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+.warehouse-transfer-form button {
+  padding: 10px 0;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.warehouse-transfer-form button:hover {
+  background: #125ea2;
+}
+.warehouse-transfer-message {
+  margin-top: 16px;
+  color: #d32f2f;
+  font-weight: 600;
+}

@@ -1,0 +1,107 @@
+.admin-approvals-container {
+  max-width: 800px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 32px;
+}
+.admin-approvals-container h2 {
+  margin-bottom: 24px;
+  color: #2c3e50;
+}
+.approvals-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+.approvals-table th, .approvals-table td {
+  border: 1px solid #e0e0e0;
+  padding: 12px 8px;
+  text-align: left;
+}
+.approvals-table th {
+  background: #f5f6fa;
+  color: #34495e;
+}
+.approvals-table tr:nth-child(even) {
+  background: #f9f9f9;
+}
+button {
+  background: #27ae60;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button:hover {
+  background: #219150;
+}
+.error {
+  background: #fdecea;
+  color: #e74c3c;
+  border: 1px solid #e74c3c;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+.success {
+  background: #eafaf1;
+  color: #27ae60;
+  border: 1px solid #27ae60;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+/* Responsive tweaks for mobile and tablet */
+@media (max-width: 900px) {
+  .container, .main, .page-container, [class*="container"] {
+    max-width: 100vw !important;
+    padding: 10px !important;
+    box-sizing: border-box;
+  }
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s;
+  }
+  .sidebar.open {
+    left: 0;
+  }
+  .sidebar-toggle {
+    display: block;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1100;
+    background: #228b22;
+    color: #fff;
+    border: none;
+    font-size: 2rem;
+    border-radius: 5px;
+    padding: 5px 10px;
+  }
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 999;
+  }
+}
+@media (max-width: 600px) {
+  h1, .header-title {
+    font-size: 1.5rem !important;
+  }
+  .container, .main, .page-container, [class*="container"] {
+    padding: 5px !important;
+    font-size: 1rem !important;
+  }
+}

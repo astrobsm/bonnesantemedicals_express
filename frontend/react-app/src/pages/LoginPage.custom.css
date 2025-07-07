@@ -1,0 +1,26 @@
+.success {
+  background: #eafaf1;
+  color: #27ae60;
+  border: 1px solid #27ae60;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+.error {
+  background: #fdecea;
+  color: #e74c3c;
+  border: 1px solid #e74c3c;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+.profile-creation {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f8f8;
+  border-radius: 6px;
+}
+.profile-creation h3 {
+  margin-bottom: 1rem;
+  color: #007bff;
+}

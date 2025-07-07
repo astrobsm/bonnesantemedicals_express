@@ -1,0 +1,148 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f8ff;
+    margin: 0;
+    padding: 0;
+}
+
+.payroll-container {
+    padding: 20px;
+    background: #f9f9f9;
+    min-height: 100vh;
+    text-align: center;
+}
+
+.payroll-container h1 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.payroll-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.payroll-button {
+    font-size: 1.2em;
+    padding: 10px 20px;
+    color: white;
+    background: linear-gradient(145deg, #1e90ff, #4682b4);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.payroll-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.4), -6px -6px 15px rgba(255, 255, 255, 0.4);
+}
+
+.payroll-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: linear-gradient(145deg, #ffffff, #e6e6e6);
+    border-radius: 10px;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.7);
+    padding: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.payroll-form label {
+    display: block;
+    margin-bottom: 15px;
+    color: #555;
+    font-weight: bold;
+}
+
+.payroll-form input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.7);
+}
+
+.payroll-form button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(145deg, #32cd32, #228b22);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2), -2px -2px 5px rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin-top: 10px;
+}
+
+.payroll-form button:hover {
+    transform: translateY(-3px);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.3);
+}
+
+.message {
+    margin-top: 20px;
+    color: green;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* Responsive tweaks for mobile and tablet */
+@media (max-width: 900px) {
+  .container, .main, .page-container, [class*="container"] {
+    max-width: 100vw !important;
+    padding: 10px !important;
+    box-sizing: border-box;
+  }
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s;
+  }
+  .sidebar.open {
+    left: 0;
+  }
+  .sidebar-toggle {
+    display: block;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1100;
+    background: #228b22;
+    color: #fff;
+    border: none;
+    font-size: 2rem;
+    border-radius: 5px;
+    padding: 5px 10px;
+  }
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 999;
+  }
+}
+@media (max-width: 600px) {
+  h1, .header-title {
+    font-size: 1.5rem !important;
+  }
+  .container, .main, .page-container, [class*="container"] {
+    padding: 5px !important;
+    font-size: 1rem !important;
+  }
+}
