@@ -3,12 +3,11 @@ services:
   - name: backend
     environment_slug: python
     source_dir: backend
-    run_command: uvicorn app.main:app --host 0.0.0.0 --port 8080
+    run_command: bash start.sh
     build_command: |
       pip install --upgrade pip
       pip install -r requirements.txt
       cd ../frontend/react-app && npm install && NODE_ENV=production npm run build && cp -r build/* ../../backend/app/static/
-      cd ../../backend && python -m alembic upgrade head
     http_port: 8080
     routes:
       - path: /
