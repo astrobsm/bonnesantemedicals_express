@@ -8,7 +8,7 @@ services:
       pip install -r requirements.txt
       cd ../frontend/react-app
       npm install
-      npm run build
+      NODE_ENV=production npm run build
       cp -r build/* ../../backend/app/static/
       cd ../../backend/app && alembic upgrade head
     http_port: 8080
@@ -17,3 +17,9 @@ services:
     envs:
       - key: DATABASE_URL
         value: <your_database_url>
+      - key: SECRET_KEY
+        value: <your_secret_key>
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
