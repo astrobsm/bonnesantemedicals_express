@@ -10,7 +10,8 @@ services:
       npm install
       NODE_ENV=production npm run build
       cp -r build/* ../../backend/app/static/
-      cd ../../backend/app && alembic upgrade head
+      cd ../../backend
+      alembic upgrade head
     http_port: 8080
     routes:
       - path: /
