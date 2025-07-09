@@ -3,7 +3,7 @@ services:
   - name: backend
     environment_slug: python
     source_dir: backend
-    run_command: bash start.sh
+    run_command: uvicorn app.main:app --host 0.0.0.0 --port 8080
     build_command: |
       pip install --upgrade pip
       pip install -r requirements.txt
@@ -11,6 +11,21 @@ services:
     http_port: 8080
     routes:
       - path: /
+    envs:
+      - key: DATABASE_URL
+        value: <your_database_url>
+      - key: SECRET_KEY
+        value: <your_secret_key>
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+
+jobs:
+  - name: migrate
+    environment_slug: python
+    source_dir: backend
+    run_command: python -m alembic upgrade head
     envs:
       - key: DATABASE_URL
         value: <your_database_url>
