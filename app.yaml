@@ -7,7 +7,12 @@ services:
     build_command: |
       pip install --upgrade pip
       pip install -r requirements.txt
-      cd ../frontend/react-app && npm install && NODE_ENV=production npm run build && cp -r build/* ../../backend/app/static/
+      ls -la ../frontend/
+      cd ../frontend/react-app && npm install && NODE_ENV=production npm run build
+      ls -la build/
+      mkdir -p ../../backend/app/static
+      cp -r build/* ../../backend/app/static/
+      ls -la ../../backend/app/static/
     http_port: 8080
     routes:
       - path: /
