@@ -79,9 +79,26 @@ def create_default_admin():
     finally:
         db.close()
 
-# Add FastAPI startup event to create default admin after migrations
+# Add FastAPI startup event to run migrations and create default admin
 @app.on_event("startup")
 def startup_event():
+    logger.info("🔄 Running database migrations...")
+    try:
+        import subprocess
+        import sys
+        result = subprocess.run([
+            sys.executable, "-m", "alembic", "upgrade", "head"
+        ], capture_output=True, text=True, cwd="/workspace/backend")
+        
+        if result.returncode == 0:
+            logger.info("✅ Database migrations completed successfully")
+        else:
+            logger.error(f"❌ Migration failed: {result.stderr}")
+            
+    except Exception as e:
+        logger.error(f"❌ Migration error: {e}")
+    
+    # Now create admin user
     create_default_admin()
 
 def get_db():
