@@ -16,11 +16,11 @@ services:
     http_port: 8080
     routes:
       - path: /
+    # Note: Set these environment variables in the DigitalOcean App Platform dashboard
+    # under Settings > App-Level Environment Variables:
+    # - DATABASE_URL: Your PostgreSQL connection string
+    # - SECRET_KEY: Your application secret key
     envs:
-      - key: DATABASE_URL
-        value: <your_database_url>
-      - key: SECRET_KEY
-        value: <your_secret_key>
       - key: ENVIRONMENT
         value: production
       - key: DEBUG
