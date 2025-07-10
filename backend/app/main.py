@@ -108,9 +108,13 @@ class LoginRequest(BaseModel):
 # Remove authentication dependencies from the application
 # Allow unrestricted access to all routes
 
-# @app.get("/")
-# async def root():
-#     return {"message": "Welcome to AstroBSM-Oracle IVANSTAMAS API"}
+@app.get("/")
+async def root():
+    return {"message": "Welcome to AstroBSM-Oracle IVANSTAMAS API", "status": "running"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "app": "AstroBSM-Oracle IVANSTAMAS"}
 
 @app.get("/api/v1/customers/")
 async def test_customers():
@@ -135,8 +139,21 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 # Serve React build static files
 static_path = os.path.join(os.path.dirname(__file__), "static")
+print(f"Static path: {static_path}")
+print(f"Static path exists: {os.path.exists(static_path)}")
 if os.path.exists(static_path):
-    app.mount("/", StaticFiles(directory=static_path, html=True), name="static")
+    print(f"Static directory contents: {os.listdir(static_path)}")
+    app.mount("/static", StaticFiles(directory=static_path), name="static")
+    
+    # Serve index.html at root for React app
+    @app.get("/app")
+    async def serve_react_app():
+        index_path = os.path.join(static_path, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        return {"error": "React app not found"}
+else:
+    print("Static directory not found!")
 
 # Serve index.html for all non-API, non-static routes (for React Router)
 from starlette.requests import Request as StarletteRequest
