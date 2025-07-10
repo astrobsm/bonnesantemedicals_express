@@ -25,3 +25,5 @@ services:
         value: production
       - key: DEBUG
         value: false
+      - key: PORT
+        value: 8080

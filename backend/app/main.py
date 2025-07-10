@@ -24,18 +24,45 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("uvicorn.error")
 
-app = FastAPI(title="AstroBSM-Oracle IVANSTAMAS")
-
 # Log startup information
 logger.info("🚀 Starting AstroBSM-Oracle IVANSTAMAS API")
 logger.info(f"📁 Current working directory: {os.getcwd()}")
 logger.info(f"🔧 FastAPI app created successfully")
 
+# Validate environment configuration
+logger.info(f"🌍 Environment: {settings.ENVIRONMENT}")
+logger.info(f"🔒 Debug mode: {settings.DEBUG}")
+
+# Validate DATABASE_URL (without logging sensitive info)
+if settings.DATABASE_URL:
+    if settings.DATABASE_URL.startswith("postgresql://"):
+        logger.info("✅ PostgreSQL DATABASE_URL configured")
+    else:
+        logger.warning("⚠️  DATABASE_URL does not appear to be PostgreSQL")
+else:
+    logger.error("❌ DATABASE_URL not configured")
+
+# Validate SECRET_KEY
+if settings.SECRET_KEY and len(settings.SECRET_KEY) > 20:
+    logger.info("✅ SECRET_KEY configured")
+else:
+    logger.warning("⚠️  SECRET_KEY appears to be default or too short")
+
+# Port validation
+port = int(os.environ.get('PORT', 8080))
+logger.info(f"🌐 Application will run on port: {port}")
+
+app = FastAPI(title="AstroBSM-Oracle IVANSTAMAS")
+
 # CORS middleware for local and production frontend
+allowed_origins = ["*"]  # Allow all origins in production for now
+if settings.ENVIRONMENT == "development":
+    allowed_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Only allow frontend origin
-    allow_credentials=True,  # Allow cookies/auth headers
+    allow_origins=allowed_origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
