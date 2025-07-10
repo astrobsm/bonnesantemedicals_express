@@ -6,7 +6,7 @@ Create Date: 2025-06-08
 from alembic import op
 import sqlalchemy as sa
 
-revision = 'add_attendance_table_20250608'
+revision = 'f7b2c1d8e9a0'
 down_revision = '7973626daea5'
 branch_labels = None
 depends_on = None
