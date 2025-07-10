@@ -5,6 +5,8 @@ services:
     source_dir: backend
     run_command: uvicorn app.main:app --host 0.0.0.0 --port 8080
     build_command: |
+      export DISABLE_ALEMBIC_REVISION=1
+      export SKIP_ALEMBIC_UPGRADE=1
       pip install --upgrade pip
       pip install -r requirements.txt
       ls -la ../frontend/
