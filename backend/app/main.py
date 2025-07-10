@@ -110,11 +110,15 @@ class LoginRequest(BaseModel):
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to AstroBSM-Oracle IVANSTAMAS API", "status": "running"}
+    return {"message": "Welcome to AstroBSM-Oracle IVANSTAMAS API", "status": "running", "timestamp": "2025-07-10"}
 
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "app": "AstroBSM-Oracle IVANSTAMAS"}
+
+@app.get("/test")
+async def test_endpoint():
+    return {"test": "success", "message": "API is working correctly"}
 
 @app.get("/api/v1/customers/")
 async def test_customers():

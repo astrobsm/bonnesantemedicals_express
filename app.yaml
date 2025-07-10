@@ -3,18 +3,11 @@ services:
   - name: backend
     environment_slug: python
     source_dir: backend
-    run_command: uvicorn app.main:app --host 0.0.0.0 --port 8080
+    run_command: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
     build_command: |
-      export DISABLE_ALEMBIC_REVISION=1
-      export SKIP_ALEMBIC_UPGRADE=1
       pip install --upgrade pip
       pip install -r requirements.txt
-      ls -la ../frontend/
-      cd ../frontend/react-app && npm install && NODE_ENV=production npm run build
-      ls -la build/
-      mkdir -p ../../backend/app/static
-      cp -r build/* ../../backend/app/static/
-      ls -la ../../backend/app/static/
+      cd ../frontend/react-app && npm install && NODE_ENV=production npm run build && cp -r build/* ../../backend/app/static/
     http_port: 8080
     routes:
       - path: /
