@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, text
 DB_NAME = os.environ.get('PGDATABASE', 'bonnesantemedical_db')
 DB_USER = os.environ.get('PGUSER', 'astrobsm')
 DB_PASSWORD = os.environ.get('PGPASSWORD', 'WttcHRFGuDdzcwFn5YtdcNodlshXJ3sT')
-DB_HOST = os.environ.get('PGHOST', 'dpg-d10a2i8gjchc73agp9a0-a.oregon-postgres.render.com')
+DB_HOST = os.environ.get('PGHOST', 'os.environ.get('PGHOST', 'localhost')')
 DB_PORT = os.environ.get('PGPORT', '5432')
 
 # The base revision for your Alembic migrations

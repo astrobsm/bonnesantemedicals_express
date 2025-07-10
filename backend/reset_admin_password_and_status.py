@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from app.db.models.user import User
 from app.core.security import get_password_hash
 
-DATABASE_URL = "postgresql://astrobsm:WttcHRFGuDdzcwFn5YtdcNodlshXJ3sT@dpg-d10a2i8gjchc73agp9a0-a.oregon-postgres.render.com/bonnesantemedical_db"
+DATABASE_URL = "os.environ.get('DATABASE_URL', 'postgresql://user:password@localhost/astrobsm_db')"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

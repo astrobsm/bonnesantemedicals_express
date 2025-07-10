@@ -5,7 +5,7 @@ This script prints all table names in the connected PostgreSQL database.
 from sqlalchemy import create_engine, inspect
 
 # Use the same DB URL as drop_all_tables.py
-DATABASE_URL = "postgresql://astrobsm:WttcHRFGuDdzcwFn5YtdcNodlshXJ3sT@dpg-d10a2i8gjchc73agp9a0-a.oregon-postgres.render.com/bonnesantemedical_db"
+DATABASE_URL = "os.environ.get('DATABASE_URL', 'postgresql://user:password@localhost/astrobsm_db')"
 
 engine = create_engine(DATABASE_URL)
 inspector = inspect(engine)

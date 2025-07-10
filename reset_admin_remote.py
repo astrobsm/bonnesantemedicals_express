@@ -3,7 +3,7 @@ import requests
 # This script will call the deployed backend's /api/v1/auth/admin/reset-admin endpoint
 # to reset the admin password and status.
 
-BACKEND_URL = "https://astrobsm-oracle-backend.onrender.com/api/v1/auth/admin/reset-admin"
+BACKEND_URL = "https://astrobsm-console-app-tcjnf.ondigitalocean.app/api/v1/auth/admin/reset-admin"
 
 try:
     response = requests.post(BACKEND_URL)

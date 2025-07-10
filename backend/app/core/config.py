@@ -5,12 +5,14 @@ import os
 
 class Settings(BaseSettings):
     DATABASE_URL: str = Field(
-        default="postgresql://astrobsm:WttcHRFGuDdzcwFn5YtdcNodlshXJ3sT@dpg-d10a2i8gjchc73agp9a0-a.oregon-postgres.render.com/bonnesantemedical_db",
-        env="DATABASE_URL"
+        default="postgresql://localhost:5432/astrobsm_db",
+        env="DATABASE_URL",
+        description="PostgreSQL database connection string"
     )
     SECRET_KEY: str = Field(
-        default="your_super_secret_key_change_this_in_production_12345678901234567890",
-        env="SECRET_KEY"
+        default="development-secret-key-change-in-production",
+        env="SECRET_KEY",
+        description="Secret key for JWT token signing"
     )
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30

@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text
 
 # Use the correct connection string for your Render Postgres instance
-engine = create_engine('postgresql://astrobsm:WttcHRFGuDdzcwFn5YtdcNodlshXJ3sT@dpg-d10a2i8gjchc73agp9a0-a.oregon-postgres.render.com/bonnesantemedical_db')
+engine = create_engine('os.environ.get('DATABASE_URL', 'postgresql://user:password@localhost/astrobsm_db')')
 
 with engine.connect() as conn:
     # Create alembic_version table if it doesn't exist
