@@ -6,8 +6,8 @@ Create Date: 2025-06-08
 from alembic import op
 import sqlalchemy as sa
 
-revision = 'add_staff_appraisal_table_20250608'
-down_revision = 'add_logo_pdf_url_to_invoices_20250608'
+revision = '2bbc77706cc7'
+down_revision = 'a517f267e387'
 branch_labels = None
 depends_on = None
 

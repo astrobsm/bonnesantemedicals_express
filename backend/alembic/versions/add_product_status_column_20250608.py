@@ -5,7 +5,7 @@ from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = 'add_product_status_column_20250608'
+revision = 'ba99133108a6'
 down_revision = 'c331c0ee4c80'
 branch_labels = None
 depends_on = None

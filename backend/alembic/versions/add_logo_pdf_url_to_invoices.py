@@ -5,8 +5,8 @@ from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = 'add_logo_pdf_url_to_invoices_20250608'
-down_revision = 'add_device_fault_report_table_20250608'
+revision = 'a517f267e387'
+down_revision = '25c9d569e4d0'
 branch_labels = None
 depends_on = None
 

@@ -3,6 +3,14 @@ set -e
 
 echo "🚀 Starting AstroBSM deployment..."
 
+# Test database connection first
+echo "🔌 Testing database connection..."
+python test_db_connection.py
+
+# Fix alembic_version column if needed
+echo "🔧 Fixing alembic_version column if needed..."
+python fix_alembic_version_column.py
+
 # Run database migrations
 echo "📊 Running database migrations..."
 python -m alembic upgrade head

@@ -6,7 +6,7 @@ Create Date: 2025-06-08
 from alembic import op
 import sqlalchemy as sa
 
-revision = 'add_device_fault_report_table_20250608'
+revision = '25c9d569e4d0'
 down_revision = 'add_attendance_table_20250608'
 branch_labels = None
 depends_on = None
