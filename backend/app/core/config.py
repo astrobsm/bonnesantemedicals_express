@@ -4,7 +4,11 @@ from pydantic import Field
 import os
 
 class Settings(BaseSettings):
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {
+        "env_file": ".env", 
+        "env_file_encoding": "utf-8",
+        "extra": "allow"  # Allow extra env vars for compatibility
+    }
     
     DATABASE_URL: str = Field(
         default="postgresql://localhost:5432/astrobsm_db",
@@ -40,11 +44,6 @@ class Settings(BaseSettings):
     APP_VERSION: str = Field(default="1.0.0", env="APP_VERSION")
     ENVIRONMENT: str = Field(default="development", env="ENVIRONMENT")
     DEBUG: bool = Field(default=True, env="DEBUG")
-
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        extra = "allow"  # Allow extra env vars for compatibility
 
 settings = Settings()
 
