@@ -19,4 +19,4 @@ class ReturnedProductCreate(ReturnedProductBase):
 class ReturnedProduct(ReturnedProductBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True

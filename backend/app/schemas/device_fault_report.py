@@ -16,4 +16,4 @@ class DeviceFaultReportOut(BaseModel):
     action_required: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True

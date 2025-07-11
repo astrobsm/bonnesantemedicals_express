@@ -28,25 +28,40 @@ def test_database_connection():
     logger.info(f"🔌 Testing connection to: {safe_url}")
     
     try:
-        # Create engine with SSL configuration for DigitalOcean
-        connect_args = {}
-        if 'ondigitalocean.com' in database_url:
-            connect_args = {
+        # Enhanced connection configuration for DigitalOcean
+        connect_args = {
+            'connect_timeout': 30,  # 30 second connection timeout
+            'application_name': 'AstroBSM-App'
+        }
+        
+        # SSL configuration for DigitalOcean
+        if 'ondigitalocean.com' in database_url or database_url.startswith('postgresql://'):
+            connect_args.update({
                 'sslmode': 'require',
                 'sslcert': None,
-                'sslkey': None,
+                'sslkey': None, 
                 'sslrootcert': None,
                 'sslcrl': None
-            }
+            })
+            logger.info("🔒 Using SSL connection to PostgreSQL")
+        
+        # Add sslmode=require to URL if not present
+        if 'sslmode=' not in database_url and 'ondigitalocean.com' in database_url:
+            separator = '&' if '?' in database_url else '?'
+            database_url = f"{database_url}{separator}sslmode=require"
+            logger.info("🔗 Added SSL mode to connection URL")
         
         engine = create_engine(
             database_url,
             connect_args=connect_args,
             pool_pre_ping=True,
-            pool_recycle=300
+            pool_recycle=300,
+            pool_timeout=30,  # 30 second pool timeout
+            echo=False  # Set to True for SQL debugging
         )
         
-        # Test connection
+        # Test connection with timeout
+        logger.info("⏳ Attempting database connection...")
         with engine.connect() as connection:
             result = connection.execute(text("SELECT version();"))
             version = result.fetchone()[0]

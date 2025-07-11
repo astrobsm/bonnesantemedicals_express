@@ -24,7 +24,7 @@ class ProductionOutputResponse(BaseModel):
     efficiency: float
     productionDate: date
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 router = APIRouter()
 

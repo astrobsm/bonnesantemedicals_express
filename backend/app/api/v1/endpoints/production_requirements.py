@@ -10,7 +10,7 @@ class ProductionRequirementItemSchema(BaseModel):
     rawMaterialId: int
     quantity: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ProductionRequirementCreateSchema(BaseModel):
     productId: int
@@ -21,7 +21,7 @@ class ProductionRequirementResponseSchema(BaseModel):
     productId: int
     requirements: List[ProductionRequirementItemSchema]
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 router = APIRouter()
 

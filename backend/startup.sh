@@ -27,22 +27,26 @@ echo "✅ Required environment variables are set"
 
 # Wait for database to be ready (with retries)
 echo "🔌 Testing database connection..."
-MAX_RETRIES=5
+MAX_RETRIES=10
 RETRY_COUNT=0
+RETRY_DELAY=15
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if python test_db_connection.py; then
+    echo "🔄 Database connection attempt $((RETRY_COUNT + 1))/$MAX_RETRIES..."
+    if timeout 45 python test_db_connection.py; then
         echo "✅ Database connection successful"
         break
     else
         RETRY_COUNT=$((RETRY_COUNT + 1))
         echo "⚠️  Database connection attempt $RETRY_COUNT/$MAX_RETRIES failed"
         if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-            echo "⏳ Waiting 10 seconds before retry..."
-            sleep 10
+            echo "⏳ Waiting $RETRY_DELAY seconds before retry..."
+            echo "🔧 Checking if database service is starting up..."
+            sleep $RETRY_DELAY
         else
             echo "❌ Database connection failed after $MAX_RETRIES attempts"
-            echo "🔧 Continuing anyway - migrations may create the database structure"
+            echo "🔧 This might be normal if database is still initializing"
+            echo "🚀 Continuing with deployment - migrations may establish connection"
         fi
     fi
 done
