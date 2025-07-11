@@ -5,14 +5,19 @@ services:
     source_dir: backend
     run_command: chmod +x startup.sh && bash startup.sh
     build_command: |
+      echo "🔧 Starting build process..."
       pip install --upgrade pip
       pip install -r requirements.txt
+      echo "📦 Backend dependencies installed"
       cd ../frontend/react-app
+      echo "🌐 Building React frontend..."
       npm install
       NODE_ENV=production npm run build
+      echo "📁 Copying React build to backend static directory..."
       mkdir -p ../../backend/app/static
       cp -r build/* ../../backend/app/static/
       ls -la ../../backend/app/static/
+      echo "✅ Build process completed"
     http_port: 8080
     routes:
       - path: /
