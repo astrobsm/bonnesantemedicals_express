@@ -6,6 +6,7 @@ Test database connection with enhanced error handling and SSL configuration.
 import os
 import sys
 import logging
+import time
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError, ProgrammingError
 import ssl
@@ -30,24 +31,40 @@ def test_database_connection():
     try:
         # Enhanced connection configuration for DigitalOcean
         connect_args = {
-            'connect_timeout': 30,  # 30 second connection timeout
-            'application_name': 'AstroBSM-App'
+            'connect_timeout': 20,  # 20 second connection timeout  
+            'application_name': 'AstroBSM-App',
+            'options': '-c statement_timeout=30000'  # 30 second statement timeout
         }
         
         # SSL configuration for DigitalOcean
-        if 'ondigitalocean.com' in database_url or database_url.startswith('postgresql://'):
+        if 'ondigitalocean.com' in database_url:
             connect_args.update({
-                'sslmode': 'require',
-                'sslcert': None,
-                'sslkey': None, 
-                'sslrootcert': None,
-                'sslcrl': None
+                'sslmode': 'require'
             })
-            logger.info("🔒 Using SSL connection to PostgreSQL")
+            logger.info("🔒 Using SSL connection to DigitalOcean PostgreSQL")
+            
+            # Ensure sslmode=require is in URL
+            if 'sslmode=' not in database_url:
+                separator = '&' if '?' in database_url else '?'
+                database_url = f"{database_url}{separator}sslmode=require"
+                logger.info("� Added sslmode=require to DATABASE_URL")
         
-        # Add sslmode=require to URL if not present
-        if 'sslmode=' not in database_url and 'ondigitalocean.com' in database_url:
-            separator = '&' if '?' in database_url else '?'
+        # Create engine with connection pooling and timeout settings
+        engine = create_engine(
+            database_url,
+            connect_args=connect_args,
+            pool_size=3,  # Smaller pool for app startup
+            max_overflow=0,
+            pool_timeout=30,  # 30 second pool timeout
+            pool_recycle=3600,  # Recycle connections every hour
+            echo=False  # Set to True for SQL debugging
+        )
+        
+        logger.info("🔧 Testing database connection with timeout...")
+        start_time = time.time()
+        
+        # Test connection with a simple query
+        with engine.connect() as connection:
             database_url = f"{database_url}{separator}sslmode=require"
             logger.info("🔗 Added SSL mode to connection URL")
         

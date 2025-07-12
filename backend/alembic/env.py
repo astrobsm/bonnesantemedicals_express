@@ -48,11 +48,33 @@ def run_migrations_offline():
         context.run_migrations()
 
 def run_migrations_online():
-    """Run migrations in 'online' mode."""
+    """Run migrations in 'online' mode with enhanced connection handling."""
+    
+    # Enhanced configuration for DigitalOcean PostgreSQL
+    configuration = config.get_section(config.config_ini_section)
+    
+    # Add connection timeout and SSL settings
+    db_url = configuration.get('sqlalchemy.url', settings.DATABASE_URL)
+    
+    # Ensure SSL mode for DigitalOcean
+    if 'ondigitalocean.com' in db_url and 'sslmode=' not in db_url:
+        separator = '&' if '?' in db_url else '?'
+        db_url = f"{db_url}{separator}sslmode=require"
+        configuration['sqlalchemy.url'] = db_url
+    
+    # Enhanced connection arguments
+    configuration.update({
+        'sqlalchemy.connect_args': {
+            'connect_timeout': 20,
+            'application_name': 'AstroBSM-Alembic',
+            'options': '-c statement_timeout=60000'  # 60 second statement timeout for migrations
+        }
+    })
+    
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        configuration,
         prefix='sqlalchemy.',
-        poolclass=pool.NullPool,
+        poolclass=pool.NullPool,  # No connection pooling for migrations
     )
 
     with connectable.connect() as connection:

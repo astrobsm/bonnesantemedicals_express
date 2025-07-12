@@ -18,6 +18,7 @@ services:
       cp -r build/* ../../backend/app/static/
       ls -la ../../backend/app/static/
       echo "✅ Build process completed"
+      echo "ℹ️  Note: Database migrations will run at startup, not during build"
     http_port: 8080
     routes:
       - path: /
