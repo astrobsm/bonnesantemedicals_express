@@ -3,6 +3,9 @@ import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+import NotificationSystem from './components/NotificationSystem';
+import PerformanceMonitor from './components/PerformanceMonitor';
 import Registration from './pages/Registration';
 import Inventory from './pages/Inventory';
 import Payroll from './pages/Payroll';
@@ -55,25 +58,41 @@ import AdminReports from './pages/AdminReports';
 import AdminSettings from './pages/AdminSettings';
 import AdminUserApprovals from './pages/AdminUserApprovals';
 import DeviceFaultReport from './pages/DeviceFaultReport';
+import InventoryManagement from './pages/InventoryManagement';
+import ProductionManagement from './pages/ProductionManagement';
 import CreateInvoice from './pages/CreateInvoice';
 import ReturnedProductEntry from './pages/ReturnedProductEntry';
 import WarehouseTransfer from './pages/WarehouseTransfer';
+import './App.css';
 
 const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [userRole, setUserRole] = useState('user');
+    const [notifications, setNotifications] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
+        const role = localStorage.getItem('userRole') || 'user';
+        
         if (!token) {
             setIsAuthenticated(false);
             navigate('/login');
         } else {
             setIsAuthenticated(true);
+            setUserRole(role);
         }
         setIsLoading(false);
     }, [navigate]);
+
+    const addNotification = (message, type = 'info') => {
+        const id = Date.now();
+        setNotifications(prev => [...prev, { id, message, type }]);
+        setTimeout(() => {
+            setNotifications(prev => prev.filter(n => n.id !== id));
+        }, 5000);
+    };
 
     if (!isAuthenticated && !isLoading) {
         return <Login />; // Render the Login component directly for unauthenticated users
@@ -83,9 +102,13 @@ const App = () => {
 
     return (
         <div className="app-container">
-            <Sidebar />
+            <Sidebar userRole={userRole} />
             <div className="main-content" id="main-content">
-                <Routes>
+                <Header userRole={userRole} />
+                <NotificationSystem notifications={notifications} />
+                <PerformanceMonitor />
+                <div className="page-wrapper">
+                    <Routes>
                     <Route path="/" element={<LoginPage />} />
                     <Route path="/dashboard" element={<AdminDashboard />} />
                     <Route path="/registration" element={<Registration />} />
@@ -123,6 +146,8 @@ const App = () => {
                     <Route path="/device-maintenance-log" element={<DeviceMaintenanceLog />} />
                     <Route path="/device-fault-reporting" element={<DeviceFaultReporting />} />
                     <Route path="/staff-management" element={<StaffManagement />} />
+                    <Route path="/inventory-management" element={<InventoryManagement />} />
+                    <Route path="/production-management" element={<ProductionManagement />} />
                     <Route path="/staff-list" element={<StaffList />} />
                     <Route path="/salary-calculation" element={<SalaryCalculation />} />
                     <Route path="/staff-appraisal" element={<StaffAppraisal />} />
@@ -145,9 +170,9 @@ const App = () => {
                     <Route path="/device-fault-report" element={<DeviceFaultReport />} />
                     <Route path="/create-invoice" element={<CreateInvoice />} />
                     <Route path="/returned-product-entry" element={<ReturnedProductEntry />} />
-                    <Route path="/warehouse-transfer" element={<WarehouseTransfer />} />
-                    <Route path="*" element={<div>Route not found: {window.location.pathname}</div>} />
-                </Routes>
+                    <Route path="/warehouse-transfer" element={<WarehouseTransfer />} />                        <Route path="*" element={<div>Route not found: {window.location.pathname}</div>} />
+                    </Routes>
+                </div>
             </div>
         </div>
     );

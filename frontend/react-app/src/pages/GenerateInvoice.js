@@ -4,7 +4,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { apiFetch } from '../utils/api';
 import './GenerateInvoice.css';
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api/v1';
 const LOGO_URL = '/logo192.png'; // Place your logo in public/logo192.png or update path
 
 const GenerateInvoice = () => {

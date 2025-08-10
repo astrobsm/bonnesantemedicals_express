@@ -32,11 +32,24 @@ def record_attendance(data: AttendanceRecordCreate, db: Session = Depends(get_db
         if record and record.time_in:
             raise HTTPException(status_code=400, detail="Time-in already recorded for today")
         if not record:
-            record = AttendanceRecord(staff_id=staff.id, date=today, time_in=now, action='IN')
+            record = AttendanceRecord(
+                staff_id=staff.id, 
+                date=today, 
+                time_in=now, 
+                action='IN',
+                fingerprint_verified=data.fingerprint_verified,
+                verification_confidence=data.verification_confidence,
+                auth_method=data.auth_method or 'manual',
+                device_info=data.device_info
+            )
             db.add(record)
         else:
             record.time_in = now
             record.action = 'IN'
+            record.fingerprint_verified = data.fingerprint_verified
+            record.verification_confidence = data.verification_confidence
+            record.auth_method = data.auth_method or 'manual'
+            record.device_info = data.device_info
     elif data.action == 'OUT':
         if not record or not record.time_in:
             raise HTTPException(status_code=400, detail="No time-in record found for today")
@@ -44,6 +57,10 @@ def record_attendance(data: AttendanceRecordCreate, db: Session = Depends(get_db
             raise HTTPException(status_code=400, detail="Time-out already recorded for today")
         record.time_out = now
         record.action = 'OUT'
+        record.fingerprint_verified = data.fingerprint_verified
+        record.verification_confidence = data.verification_confidence
+        record.auth_method = data.auth_method or 'manual'
+        record.device_info = data.device_info
         if record.time_in:
             record.hours_worked = (record.time_out - record.time_in).total_seconds() / 3600.0
     else:
@@ -68,6 +85,10 @@ def get_attendance_with_names(db: Session = Depends(get_db)):
             "time_in": r.time_in,
             "time_out": r.time_out,
             "hours_worked": r.hours_worked,
-            "action": r.action
+            "action": r.action,
+            "fingerprint_verified": r.fingerprint_verified,
+            "verification_confidence": r.verification_confidence,
+            "auth_method": r.auth_method,
+            "created_at": r.created_at
         })
     return result

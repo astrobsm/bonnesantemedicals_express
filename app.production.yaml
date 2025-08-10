@@ -1,0 +1,65 @@
+name: astrobsm-oracle-ivanstamas
+services:
+  - name: backend
+    environment_slug: python
+    source_dir: backend
+    run_command: python start_server.py
+    build_command: |
+      echo "🔧 Starting production build process..."
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      echo "📦 Backend dependencies installed"
+      cd ../frontend/react-app
+      echo "🌐 Building React frontend for production..."
+      npm install
+      NODE_ENV=production npm run build
+      echo "📁 Copying React build to backend static directory..."
+      mkdir -p ../../backend/app/static
+      cp -r build/* ../../backend/app/static/
+      ls -la ../../backend/app/static/
+      echo "✅ Production build process completed"
+    http_port: 8000
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    envs:
+      - key: ENVIRONMENT
+        value: "production"
+      - key: SKIP_DATABASE
+        value: "true"
+      - key: DEBUG
+        value: "false"
+      - key: HOST
+        value: "0.0.0.0"
+      - key: PORT
+        value: "8000"
+      - key: FINGERPRINT_SIMULATION_MODE
+        value: "true"
+      - key: LOG_LEVEL
+        value: "INFO"
+      - key: API_V1_PREFIX
+        value: "/api/v1"
+      - key: STATIC_URL_PATH
+        value: "/static"
+      - key: CORS_CREDENTIALS
+        value: "true"
+      - key: ENABLE_FINGERPRINT_ENROLLMENT
+        value: "true"
+      - key: ENABLE_ATTENDANCE_TRACKING
+        value: "true"
+      - key: ENABLE_REPORTS
+        value: "true"
+      - key: ENABLE_USER_MANAGEMENT
+        value: "true"
+    routes:
+      - path: /
+      - path: /api
+      - path: /docs
+      - path: /health
+      - path: /static
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3

@@ -16,7 +16,7 @@ const SalaryCalculation = () => {
     useEffect(() => {
         const fetchStaff = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/v1/staff');
+                const response = await fetch('/api/v1/staff');
                 const data = await response.json();
                 setStaff(Array.isArray(data) ? data : []);
             } catch (error) {
@@ -34,7 +34,7 @@ const SalaryCalculation = () => {
 
     const fetchHoursWorked = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/hours-worked/${formData.staffId}?duration=${formData.duration}`);
+            const response = await fetch(`/api/v1/hours-worked/${formData.staffId}?duration=${formData.duration}`);
             const data = await response.json();
             setFormData({ ...formData, hoursWorked: data.hoursWorked });
         } catch (error) {

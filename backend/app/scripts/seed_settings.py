@@ -1,8 +1,9 @@
-from app.db.session import SessionLocal
+from app.db.session import AsyncSessionLocal
 from app.db.models.settings import Settings
 
 def seed_default_settings():
-    db = SessionLocal()
+    import asyncio
+    db = asyncio.run(AsyncSessionLocal().__aenter__())
     if not db.query(Settings).filter(Settings.page_name == '/dashboard').first():
         s = Settings(
             page_name='/dashboard',

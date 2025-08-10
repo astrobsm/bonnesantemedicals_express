@@ -3,10 +3,10 @@ module.exports = {
     roots: ['<rootDir>/src'],
     testEnvironment: 'jsdom',
     transform: {
-        '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
+        '^.+\\.[jt]sx?$': 'babel-jest',
     },
     transformIgnorePatterns: [
-        '/node_modules/(?!(idb|axios)/)'
+        '/node_modules/(?!axios).+\\.js$/'
     ],
     moduleNameMapper: {
         '\\.(css|less|scss|sass)$': 'identity-obj-proxy',

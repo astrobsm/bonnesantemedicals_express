@@ -1,5 +1,5 @@
 # Script to seed test data for all registration types
-from app.db.session import SessionLocal
+from app.db.session import AsyncSessionLocal
 from app.db.models.user import User
 from app.db.models.staff import Staff
 from app.db.models.supplier import Supplier
@@ -9,7 +9,8 @@ from app.services.auth_service import create_user
 # Add more imports as needed for other models
 
 def seed():
-    db = SessionLocal()
+    import asyncio
+    db = asyncio.run(AsyncSessionLocal().__aenter__())
     try:
         # Admin user
         if not db.query(User).filter_by(username="admin").first():

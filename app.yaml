@@ -1,5 +1,23 @@
-name: astrobsm-app
+name: astrobsm-oracle-ivanstamas
 services:
+  - name: backend
+    environment_slug: python
+    source_dir: backend
+    run_command: python start_server.py
+    build_command: |
+      echo "🔧 Starting build process..."
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      echo "📦 Backend dependencies installed"
+      cd ../frontend/react-app
+      echo "🌐 Building React frontend..."
+      npm install
+      NODE_ENV=production npm run build
+      echo "📁 Copying React build to backend static directory..."
+      mkdir -p ../../backend/app/static
+      cp -r build/* ../../backend/app/static/
+      ls -la ../../backend/app/static/
+      echo "✅ Build process completed"services:
   - name: backend
     environment_slug: python
     source_dir: backend
@@ -25,6 +43,13 @@ services:
     # Note: Set these environment variables in the DigitalOcean App Platform dashboard
     # under Settings > App-Level Environment Variables:
     # - DATABASE_URL: Your PostgreSQL connection string
+    envs:
+      - key: DATABASE_URL
+        value: "postgresql://username:password@hostname:port/database"
+      - key: SECRET_KEY
+        value: "your-secret-key-here"
+      - key: SKIP_DATABASE
+        value: "false"
     # - SECRET_KEY: Your application secret key
     envs:
       - key: ENVIRONMENT
@@ -33,3 +58,7 @@ services:
         value: false
       - key: PORT
         value: 8080
+      - key: DATABASE_URL
+        value: postgresql+asyncpg://username:password@hostname:port/database?sslmode=require
+      - key: SECRET_KEY
+        value: AstroBSM-Oracle-Production-Secret-Key-2024-Secure

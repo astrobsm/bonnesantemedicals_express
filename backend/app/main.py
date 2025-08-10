@@ -5,7 +5,7 @@ from app.api.v1 import api_router
 from app.core.config import settings
 from app.services.auth_service import create_user
 from app.db.models.user import User
-from app.db.session import SessionLocal
+from app.db.session import SessionLocal, async_session_maker
 from pydantic import BaseModel
 from app.api.v1.production_analysis import router as production_analysis_router
 from app.api.v1.endpoints import auth
@@ -87,28 +87,45 @@ app.include_router(production_analysis_router, prefix="/api/v1/production_analys
 # Include the auth router
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 
-def create_default_admin():
-    db = SessionLocal()
+# Include fingerprint router
+try:
+    from app.api.v1.endpoints.fingerprint import router as fingerprint_router
+    app.include_router(fingerprint_router, prefix="/api/v1", tags=["Fingerprint"])
+    logger.info("✅ Fingerprint endpoints loaded successfully")
+except ImportError as e:
+    logger.warning(f"⚠️  Fingerprint module not available: {e}")
+except Exception as e:
+    logger.error(f"❌ Error loading fingerprint endpoints: {e}")
+
+import sqlalchemy
+from sqlalchemy.future import select
+import asyncio
+async def create_default_admin():
     admin_username = "blakvelvet"
     admin_password = "chibuike_douglas"
     admin_role = "Admin"
     try:
-        # Check if the admin user already exists
-        existing_admin = db.query(User).filter(User.username == admin_username).first()
-        if not existing_admin:
-            create_user(db, username=admin_username, password=admin_password, role=admin_role)
-            print("Default admin user created.")
-        else:
-            print("Admin user already exists.")
+        async with async_session_maker() as db:
+            result = await db.execute(select(User).where(User.username == admin_username))
+            existing_admin = result.scalars().first()
+            if not existing_admin:
+                await create_user(db, username=admin_username, password=admin_password, role=admin_role)
+                print("Default admin user created.")
+            else:
+                print("Admin user already exists.")
     except (ProgrammingError, OperationalError) as e:
         print("[WARNING] Could not create/check admin user. Table may not exist yet.")
         print(e)
-    finally:
-        db.close()
 
 # Add FastAPI startup event to run migrations and create default admin
 @app.on_event("startup")
-def startup_event():
+async def startup_event():
+    # Skip database operations if SKIP_DATABASE is set
+    if os.environ.get("SKIP_DATABASE") == "true":
+        logger.info("⚠️ SKIP_DATABASE is set - skipping database operations")
+        logger.info("🔐 Fingerprint service will run in simulation mode")
+        return
+        
     logger.info("🔄 Running database migrations...")
     try:
         import subprocess
@@ -116,24 +133,18 @@ def startup_event():
         result = subprocess.run([
             sys.executable, "-m", "alembic", "upgrade", "head"
         ], capture_output=True, text=True, cwd="/workspace/backend")
-        
         if result.returncode == 0:
             logger.info("✅ Database migrations completed successfully")
         else:
             logger.error(f"❌ Migration failed: {result.stderr}")
-            
     except Exception as e:
         logger.error(f"❌ Migration error: {e}")
-    
     # Now create admin user
-    create_default_admin()
+    await create_default_admin()
 
-def get_db():
-    db = SessionLocal()
-    try:
+async def get_db():
+    async with async_session_maker() as db:
         yield db
-    finally:
-        db.close()
 
 class LoginRequest(BaseModel):
     username: str
@@ -159,7 +170,26 @@ class LoginRequest(BaseModel):
 
 @app.get("/")
 async def root():
-    logger.info("🏠 Root endpoint accessed")
+    logger.info("🏠 Root endpoint accessed - serving React app")
+    # Serve the React app index.html for the root route
+    static_path = os.path.join(os.path.dirname(__file__), "static")
+    index_path = os.path.join(static_path, "index.html")
+    logger.info(f"🌐 Serving React app from: {index_path}")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    else:
+        # Fallback to API response if React app not found
+        return {
+            "message": "Welcome to AstroBSM-Oracle IVANSTAMAS API", 
+            "status": "running", 
+            "timestamp": "2025-07-10",
+            "environment": os.getenv("ENVIRONMENT", "development"),
+            "error": "React app not found at expected path"
+        }
+
+@app.get("/api/status")
+async def api_status():
+    logger.info("📊 API status endpoint accessed")
     return {
         "message": "Welcome to AstroBSM-Oracle IVANSTAMAS API", 
         "status": "running", 

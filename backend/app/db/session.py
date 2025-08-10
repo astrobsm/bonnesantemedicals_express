@@ -1,45 +1,160 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from app.db.base import Base
 from app.core.config import settings
+import os
+
+# Check if database should be skipped
+SKIP_DATABASE = os.getenv("SKIP_DATABASE", "false").lower() == "true"
 
 # Use the DATABASE_URL from settings, which handles env and prefix fix
 DATABASE_URL = settings.DATABASE_URL
 
-# Enhanced engine configuration for production deployment with better timeouts
-connect_args = {
-    'connect_timeout': 20,  # Reduced from 30 to 20 seconds
-    'application_name': 'AstroBSM-Production',
-    'options': '-c statement_timeout=30000'  # 30 second statement timeout
-}
-
-# Add SSL configuration for DigitalOcean
-if 'ondigitalocean.com' in DATABASE_URL:
-    connect_args.update({
-        'sslmode': 'require'
-    })
+# Mock session for when database is skipped
+class MockSession:
+    def query(self, *args, **kwargs):
+        return MockQuery()
     
-    # Ensure sslmode=require is in URL if not present
-    if 'sslmode=' not in DATABASE_URL:
-        separator = '&' if '?' in DATABASE_URL else '?'
-        DATABASE_URL = f"{DATABASE_URL}{separator}sslmode=require"
+    def add(self, *args, **kwargs):
+        pass
+    
+    def commit(self, *args, **kwargs):
+        pass
+    
+    def rollback(self, *args, **kwargs):
+        pass
+    
+    def close(self, *args, **kwargs):
+        pass
+    
+    def refresh(self, *args, **kwargs):
+        pass
 
-engine = create_engine(
-    DATABASE_URL,
-    connect_args=connect_args,
-    pool_pre_ping=True,  # Test connections before use
-    pool_recycle=1800,   # Recycle connections every 30 minutes (was 5 min)
-    pool_timeout=60,     # Wait up to 60 seconds for connection from pool
-    pool_size=10,
-    max_overflow=20,
-    echo=settings.DEBUG  # Log SQL in debug mode
-)
+class MockQuery:
+    def filter(self, *args, **kwargs):
+        return self
+    
+    def filter_by(self, *args, **kwargs):
+        return self
+    
+    def first(self, *args, **kwargs):
+        return None
+    
+    def all(self, *args, **kwargs):
+        return []
+    
+    def count(self, *args, **kwargs):
+        return 0
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Initialize session makers - always create them for imports even if not used
+engine = None
+SessionLocal = None
+async_session_maker = None
 
+if not SKIP_DATABASE and DATABASE_URL:
+    try:
+        if 'asyncpg' in DATABASE_URL:
+            # Async PostgreSQL configuration
+            # Create sync engine for sync compatibility
+            sync_url = DATABASE_URL.replace('postgresql+asyncpg://', 'postgresql://')
+            engine = create_engine(
+                sync_url,
+                connect_args={"sslmode": "require"} if 'ondigitalocean.com' in sync_url else {},
+                pool_pre_ping=True,
+                pool_recycle=1800,
+                pool_timeout=60,
+                pool_size=10,
+                max_overflow=20,
+                echo=settings.DEBUG
+            )
+            SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+            
+            # Async engine
+            async_engine = create_async_engine(
+                DATABASE_URL,
+                connect_args={"server_settings": {"jit": "off"}} if 'ondigitalocean.com' in DATABASE_URL else {},
+                pool_pre_ping=True,
+                pool_recycle=1800,
+                pool_timeout=60,
+                pool_size=10,
+                max_overflow=20,
+                echo=settings.DEBUG
+            )
+            async_session_maker = async_sessionmaker(
+                bind=async_engine,
+                expire_on_commit=False,
+                class_=AsyncSession
+            )
+        else:
+            # Synchronous database configuration
+            connect_args = {
+                'connect_timeout': 20,
+                'application_name': 'AstroBSM-Production',
+                'options': '-c statement_timeout=30000'
+            }
+            engine = create_engine(
+                DATABASE_URL,
+                connect_args=connect_args,
+                pool_pre_ping=True,
+                pool_recycle=1800,
+                pool_timeout=60,
+                pool_size=10,
+                max_overflow=20,
+                echo=settings.DEBUG
+            )
+            SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    except Exception as e:
+        print(f"[WARNING] Database connection setup failed: {e}")
+        print("[WARNING] Falling back to mock session")
+        SKIP_DATABASE = True
+
+# Fallback to mock session if database setup failed
+if SKIP_DATABASE or SessionLocal is None:
+    class MockEngine:
+        pass
+    
+    class MockSessionLocal:
+        def __call__(self):
+            return MockSession()
+    
+    engine = MockEngine()
+    SessionLocal = MockSessionLocal()
+    async_session_maker = MockSessionLocal()
+
+# Dependency injection for database session
 def get_db():
-    db = SessionLocal()
+    """Database session dependency with SKIP_DATABASE support."""
+    if SKIP_DATABASE:
+        # Return mock session when database is skipped
+        yield MockSession()
+        return
+    
+    if async_session_maker and 'asyncpg' in DATABASE_URL:
+        # For async databases, we need a sync wrapper
+        db = SessionLocal()
+    else:
+        db = SessionLocal()
+    
     try:
         yield db
     finally:
-        db.close()
+        if hasattr(db, 'close'):
+            db.close()
+
+def get_db_sync():
+    """Synchronous database session getter."""
+    if SKIP_DATABASE:
+        return MockSession()
+    
+    return SessionLocal()
+
+def get_db_async():
+    """Asynchronous database session getter."""
+    if SKIP_DATABASE:
+        return MockSession()
+    
+    if async_session_maker:
+        return async_session_maker()
+    else:
+        return MockSession()

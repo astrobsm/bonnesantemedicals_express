@@ -5,7 +5,9 @@ export async function apiFetch(url, options = {}) {
     ...(options.headers || {}),
     ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
   };
-  return fetch(url, {
+  // Prepend base URL if url is relative
+  const fullUrl = url.startsWith('http') ? url : `${API_CONFIG.BASE_URL}${url.startsWith('/') ? url : '/' + url}`;
+  return fetch(fullUrl, {
     ...options,
     headers,
   });

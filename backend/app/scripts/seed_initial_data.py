@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.db.session import SessionLocal
+from app.db.session import AsyncSessionLocal
 from app.db.models.inventory import Product
 from app.db.models.raw_material import RawMaterial
 from app.db.models.customer import Customer
@@ -10,7 +10,8 @@ from app.db.models.marketer import Marketer
 from datetime import date
 
 def seed():
-    db: Session = SessionLocal()
+    import asyncio
+    db = asyncio.run(AsyncSessionLocal().__aenter__())
     try:
         # Add Product
         if not db.query(Product).first():

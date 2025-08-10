@@ -5,7 +5,9 @@ import './Registration.css';
 import { saveFormData } from '../db/indexedDB';
 import WebAuthnButton from '../components/WebAuthnButton';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api/v1';
+import API_BASE_URL from '../config';
+
+const API_BASE_URL_CONFIG = API_BASE_URL;
 
 const Registration = () => {
     const [formData, setFormData] = useState({

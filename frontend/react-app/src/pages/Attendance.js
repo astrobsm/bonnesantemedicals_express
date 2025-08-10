@@ -16,7 +16,7 @@ const Attendance = () => {
             return;
         }
         try {
-            const res = await apiFetch('http://localhost:8000/api/v1/attendance', {
+            const res = await apiFetch('/api/v1/attendance', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,9 +1,10 @@
-from app.db.session import SessionLocal
+from app.db.session import AsyncSessionLocal
 from app.db.models.staff import Staff
 from datetime import date
 
 def seed_staff():
-    db = SessionLocal()
+    import asyncio
+    db = asyncio.run(AsyncSessionLocal().__aenter__())
     staff_list = [
         Staff(
             name="John Doe",

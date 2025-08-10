@@ -50,7 +50,7 @@ const Settings = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/v1/settings');
+                const response = await fetch('/api/v1/settings');
                 if (!response.ok) {
                     setAllSettings([]);
                     setSettingsError('Settings not found. You may need to configure them.');
@@ -96,7 +96,7 @@ const Settings = () => {
     // Fetch users and warehouses for Grant Access
     useEffect(() => {
         if (showGrantAccess) {
-            fetch('http://localhost:8000/api/v1/auth/list-users').then(res => res.json()).then(setUsers);
+            fetch('/api/v1/auth/list-users').then(res => res.json()).then(setUsers);
             fetch('/api/v1/warehouses').then(res => res.json()).then(setWarehouses);
         }
     }, [showGrantAccess]);
@@ -119,7 +119,7 @@ const Settings = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8000/api/v1/settings', {
+            const response = await fetch('/api/v1/settings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ const Settings = () => {
             const data = await response.json();
             alert('Settings applied successfully!');
             // Refresh settings after update
-            const refreshed = await fetch('http://localhost:8000/api/v1/settings');
+            const refreshed = await fetch('/api/v1/settings');
             if (refreshed.ok) {
                 setAllSettings(await refreshed.json());
             }

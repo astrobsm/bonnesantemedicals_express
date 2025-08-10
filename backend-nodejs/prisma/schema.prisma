@@ -1,0 +1,537 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int      @id @default(autoincrement())
+  username           String   @unique
+  hashedPassword     String   @map("hashed_password")
+  role               String
+  facialScanData     Bytes?   @map("facial_scan_data")
+  qrCode             String?  @map("qr_code")
+  status             String   @default("pending")
+  profileCompleted   Boolean  @default(false) @map("profile_completed")
+  fullName           String?  @map("full_name")
+  email              String?  @unique
+  phone              String?
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  warehouseAccess    UserWarehouseAccess[]
+  sectionAccess      UserSectionAccess[]
+  attendanceRecords  AttendanceRecord[]
+  invoices           Invoice[]
+
+  @@map("users")
+}
+
+model Staff {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  staffId            String   @unique @map("staff_id")
+  phone              String?
+  nextOfKinName      String?  @map("next_of_kin_name")
+  nextOfKinPhone     String?  @map("next_of_kin_phone")
+  bankName           String?  @map("bank_name")
+  accountNumber      String?  @map("account_number")
+  address            String?
+  hourlyRate         Float?   @map("hourly_rate")
+  role               String?
+  department         String?
+  appointmentType    String?  @map("appointment_type")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  stockIntakes       ProductStockIntake[]
+  rawMaterialIntakes RawMaterialStockIntake[]
+  productionOutputs  ProductionOutput[]
+  appraisals         StaffAppraisal[]
+  attendanceRecords  AttendanceRecord[]
+  receivedReturns    ReturnedProduct[]
+
+  @@map("staff")
+}
+
+model Product {
+  id                      Int      @id @default(autoincrement())
+  name                    String
+  productId               String   @unique @map("product_id")
+  description             String
+  unitOfMeasure           String   @map("unit_of_measure")
+  unitPrice               Float    @map("unit_price")
+  reorderPoint            Int      @map("reorder_point")
+  openingStockQuantity    Int      @map("opening_stock_quantity")
+  averageProductionTime   Float    @map("average_production_time")
+  status                  String   @default("Green")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  inventoryItems          Inventory[]
+  stockIntakes            ProductStockIntake[]
+  productionOutputs       ProductionOutput[]
+  productionConsoleOutputs ProductionConsoleOutput[]
+  invoiceItems            InvoiceItem[]
+  returnedProducts        ReturnedProduct[]
+  productionRequirements  ProductionRequirementItem[]
+
+  @@map("products")
+}
+
+model RawMaterial {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  description        String?
+  unitOfMeasure      String   @map("unit_of_measure")
+  reorderPoint       Int      @map("reorder_point")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  inventoryItems     Inventory[]
+  stockIntakes       RawMaterialStockIntake[]
+  productionRequirements ProductionRequirementItem[]
+
+  @@map("raw_materials")
+}
+
+model Inventory {
+  id              Int      @id @default(autoincrement())
+  productId       Int?     @map("product_id")
+  rawMaterialId   Int?     @map("raw_material_id")
+  quantity        Int
+  warehouseId     Int?     @map("warehouse_id")
+  batchNo         String?  @map("batch_no")
+  expiryDate      DateTime? @map("expiry_date")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  product         Product?     @relation(fields: [productId], references: [id])
+  rawMaterial     RawMaterial? @relation(fields: [rawMaterialId], references: [id])
+  warehouse       Warehouse?   @relation(fields: [warehouseId], references: [id])
+
+  @@map("inventory")
+}
+
+model Warehouse {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  location           String
+  manager            String?
+  managerPhone       String?  @map("manager_phone")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  inventoryItems     Inventory[]
+  stockIntakes       ProductStockIntake[]
+  rawMaterialIntakes RawMaterialStockIntake[]
+  userAccess         UserWarehouseAccess[]
+  sourceTransfers    WarehouseTransfer[] @relation("SourceWarehouse")
+  destinationTransfers WarehouseTransfer[] @relation("DestinationWarehouse")
+
+  @@map("warehouses")
+}
+
+model Customer {
+  id             Int      @id @default(autoincrement())
+  name           String
+  customerId     String   @unique @map("customer_id")
+  phone          String?
+  address        String?
+  company        String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  invoices       Invoice[]
+  performance    CustomerPerformance[]
+  returnedProducts ReturnedProduct[]
+
+  @@map("customers")
+}
+
+model Supplier {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  supplierId         String?  @unique @map("supplier_id")
+  phone              String?
+  country            String?
+  state              String?
+  phoneNumber        String?  @map("phone_number")
+  address            String?
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  rawMaterialIntakes RawMaterialStockIntake[]
+
+  @@map("suppliers")
+}
+
+model ProductStockIntake {
+  id             Int      @id @default(autoincrement())
+  productId      Int      @map("product_id")
+  quantity       Int
+  dateOfIntake   DateTime @map("date_of_intake")
+  expiryDate     DateTime? @map("expiry_date")
+  staffId        Int      @map("staff_id")
+  warehouseId    Int      @map("warehouse_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  product        Product   @relation(fields: [productId], references: [id])
+  staff          Staff     @relation(fields: [staffId], references: [id])
+  warehouse      Warehouse @relation(fields: [warehouseId], references: [id])
+
+  @@map("product_stock_intake")
+}
+
+model RawMaterialStockIntake {
+  id             Int      @id @default(autoincrement())
+  rawMaterialId  Int      @map("raw_material_id")
+  quantity       Int
+  supplier       String?
+  expiryDate     DateTime? @map("expiry_date")
+  dateOfIntake   DateTime @map("date_of_intake")
+  intakeStaff    String   @map("intake_staff")
+  warehouseId    Int?     @map("warehouse_id")
+  supplierId     Int?     @map("supplier_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  rawMaterial    RawMaterial @relation(fields: [rawMaterialId], references: [id])
+  warehouse      Warehouse?  @relation(fields: [warehouseId], references: [id])
+  supplierRecord Supplier?   @relation(fields: [supplierId], references: [id])
+  staff          Staff       @relation(fields: [intakeStaff], references: [staffId])
+
+  @@map("raw_material_stock_intake")
+}
+
+model AttendanceRecord {
+  id         Int      @id @default(autoincrement())
+  userId     Int?     @map("user_id")
+  staffId    Int?     @map("staff_id")
+  action     String
+  timestamp  DateTime @default(now())
+  date       DateTime @default(now())
+  timeIn     DateTime? @map("time_in")
+  timeOut    DateTime? @map("time_out")
+  hoursWorked Float?   @map("hours_worked")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user       User?    @relation(fields: [userId], references: [id])
+  staff      Staff?   @relation(fields: [staffId], references: [id])
+
+  @@map("attendance_records")
+}
+
+model Invoice {
+  id             Int      @id @default(autoincrement())
+  customerId     Int      @map("customer_id")
+  date           DateTime @default(now())
+  totalAmount    Float    @map("total_amount")
+  discount       Float    @default(0)
+  tax            Float    @default(0)
+  finalAmount    Float    @map("final_amount")
+  status         String   @default("pending")
+  createdBy      Int      @map("created_by")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  customer       Customer      @relation(fields: [customerId], references: [id])
+  createdByUser  User          @relation(fields: [createdBy], references: [id])
+  items          InvoiceItem[]
+
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id         Int   @id @default(autoincrement())
+  invoiceId  Int   @map("invoice_id")
+  productId  Int   @map("product_id")
+  quantity   Int
+  price      Float
+
+  // Relations
+  invoice    Invoice @relation(fields: [invoiceId], references: [id])
+  product    Product @relation(fields: [productId], references: [id])
+
+  @@map("invoice_items")
+}
+
+model ProductionOutput {
+  id                Int      @id @default(autoincrement())
+  productId         Int      @map("product_id")
+  quantityProduced  Int      @map("quantity_produced")
+  goodProducts      Int      @map("good_products")
+  damagedProducts   Int      @map("damaged_products")
+  productionDate    DateTime @map("production_date")
+  staffIds          String[] @map("staff_ids")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  product           Product  @relation(fields: [productId], references: [id])
+  staff             Staff    @relation(fields: [staffIds], references: [staffId])
+
+  @@map("production_output")
+}
+
+model ProductionRequirement {
+  id          Int      @id @default(autoincrement())
+  productId   Int      @map("product_id")
+  quantity    Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  items       ProductionRequirementItem[]
+
+  @@map("production_requirements")
+}
+
+model ProductionRequirementItem {
+  id                     Int    @id @default(autoincrement())
+  productionRequirementId Int   @map("production_requirement_id")
+  productId              Int?   @map("product_id")
+  rawMaterialId          Int?   @map("raw_material_id")
+  quantity               Int
+
+  // Relations
+  productionRequirement  ProductionRequirement @relation(fields: [productionRequirementId], references: [id])
+  product                Product?              @relation(fields: [productId], references: [id])
+  rawMaterial            RawMaterial?          @relation(fields: [rawMaterialId], references: [id])
+
+  @@map("production_requirement_items")
+}
+
+model ProductionConsoleOutput {
+  id         Int      @id @default(autoincrement())
+  productId  Int      @map("product_id")
+  quantity   Int
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@map("production_console_output")
+}
+
+model StaffAppraisal {
+  id              Int      @id @default(autoincrement())
+  staffId         Int      @map("staff_id")
+  appraisalDate   DateTime @map("appraisal_date")
+  performance     String
+  goals           String
+  feedback        String
+  rating          Int
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  staff           Staff    @relation(fields: [staffId], references: [id])
+
+  @@map("staff_appraisals")
+}
+
+model CustomerPerformance {
+  id             Int      @id @default(autoincrement())
+  customerId     Int      @map("customer_id")
+  totalPurchases Float    @map("total_purchases")
+  lastPurchase   DateTime? @map("last_purchase")
+  rating         Int?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  customer       Customer @relation(fields: [customerId], references: [id])
+
+  @@map("customer_performance")
+}
+
+model ReturnedProduct {
+  id                  Int      @id @default(autoincrement())
+  productId           Int      @map("product_id")
+  quantity            Int
+  batchNo             String?  @map("batch_no")
+  manufacturingDate   DateTime? @map("manufacturing_date")
+  expiryDate          DateTime? @map("expiry_date")
+  dateOfReturn        DateTime @map("date_of_return")
+  reason              String
+  customerId          Int      @map("customer_id")
+  receivingStaffId    Int      @map("receiving_staff_id")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  product             Product  @relation(fields: [productId], references: [id])
+  customer            Customer @relation(fields: [customerId], references: [id])
+  receivingStaff      Staff    @relation(fields: [receivingStaffId], references: [id])
+
+  @@map("returned_products")
+}
+
+model Settings {
+  id               Int      @id @default(autoincrement())
+  pageName         String   @map("page_name")
+  backgroundImage  String?  @map("background_image")
+  fontFamily       String?  @map("font_family")
+  theme            String?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@unique([pageName])
+  @@map("settings")
+}
+
+model UserWarehouseAccess {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  warehouseId Int       @map("warehouse_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id])
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+
+  @@unique([userId, warehouseId])
+  @@map("user_warehouse_access")
+}
+
+model UserSectionAccess {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  sectionName String   @map("section_name")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, sectionName])
+  @@map("user_section_access")
+}
+
+model WarehouseTransfer {
+  id                    Int      @id @default(autoincrement())
+  productId             Int      @map("product_id")
+  quantity              Int
+  sourceWarehouseId     Int      @map("source_warehouse_id")
+  destinationWarehouseId Int     @map("destination_warehouse_id")
+  transferDate          DateTime @default(now()) @map("transfer_date")
+  notes                 String?
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  sourceWarehouse       Warehouse @relation("SourceWarehouse", fields: [sourceWarehouseId], references: [id])
+  destinationWarehouse  Warehouse @relation("DestinationWarehouse", fields: [destinationWarehouseId], references: [id])
+
+  @@map("warehouse_transfers")
+}
+
+model Device {
+  id           Int      @id @default(autoincrement())
+  name         String
+  deviceType   String   @map("device_type")
+  location     String
+  status       String   @default("active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  maintenanceLogs DeviceMaintenanceLog[]
+  faultReports    DeviceFaultReport[]
+
+  @@map("devices")
+}
+
+model DeviceMaintenanceLog {
+  id               Int      @id @default(autoincrement())
+  deviceId         Int      @map("device_id")
+  maintenanceDate  DateTime @map("maintenance_date")
+  description      String
+  performedBy      String   @map("performed_by")
+  cost             Float?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  device           Device   @relation(fields: [deviceId], references: [id])
+
+  @@map("device_maintenance_logs")
+}
+
+model DeviceFaultReport {
+  id           Int      @id @default(autoincrement())
+  deviceId     Int      @map("device_id")
+  faultDate    DateTime @map("fault_date")
+  description  String
+  severity     String
+  reportedBy   String   @map("reported_by")
+  status       String   @default("open")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  device       Device   @relation(fields: [deviceId], references: [id])
+
+  @@map("device_fault_reports")
+}
+
+model ProductionAnalysis {
+  id              Int      @id @default(autoincrement())
+  date            DateTime
+  productName     String   @map("product_name")
+  goodProducts    Int      @map("good_products")
+  damagedProducts Int      @map("damaged_products")
+  efficiency      Float
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("production_analysis")
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int?     @map("user_id")
+  action     String
+  tableName  String   @map("table_name")
+  recordId   Int?     @map("record_id")
+  oldValues  Json?    @map("old_values")
+  newValues  Json?    @map("new_values")
+  timestamp  DateTime @default(now())
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+
+  @@map("audit_logs")
+}
+
+model ExportTracking {
+  id           Int      @id @default(autoincrement())
+  exportType   String   @map("export_type")
+  fileName     String   @map("file_name")
+  exportedBy   Int      @map("exported_by")
+  exportDate   DateTime @default(now()) @map("export_date")
+  recordCount  Int      @map("record_count")
+  status       String   @default("completed")
+
+  @@map("export_tracking")
+}

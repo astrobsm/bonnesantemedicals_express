@@ -18,6 +18,7 @@ from .endpoints.appraisal import router as appraisal_router
 from .endpoints.device_fault_report import router as device_fault_report_router
 from app.api.v1.endpoints.warehouse_transfer import router as warehouse_transfer_router
 from .endpoints import returned_products
+from .endpoints.fingerprint import router as fingerprint_router
 # Add other endpoint imports as needed
 
 api_router.include_router(health.router, prefix="/health", tags=["Health"])
@@ -51,4 +52,5 @@ api_router.include_router(appraisal_router, prefix="/appraisal", tags=["Appraisa
 api_router.include_router(device_fault_report_router, prefix="/device-fault-reporting", tags=["Device Fault Reporting"])
 api_router.include_router(warehouse_transfer_router, tags=["Warehouse Transfer"])
 api_router.include_router(returned_products.router, prefix="/returned-products", tags=["Returned Products"])
+api_router.include_router(fingerprint_router, tags=["Fingerprint"])
 # Include other routers as needed

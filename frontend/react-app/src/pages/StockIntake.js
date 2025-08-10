@@ -17,7 +17,7 @@ const StockIntake = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/v1/products');
+                const response = await fetch('/api/v1/products');
                 const data = await response.json();
                 setProducts(data);
             } catch (error) {
@@ -27,7 +27,7 @@ const StockIntake = () => {
 
         const fetchStaff = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/v1/staff');
+                const response = await fetch('/api/v1/staff');
                 const data = await response.json();
                 setStaff(data);
             } catch (error) {
@@ -49,7 +49,7 @@ const StockIntake = () => {
         setLoading(true);
         setMessage('');
         try {
-            const response = await fetch('http://localhost:8000/api/v1/stock-intake', {
+            const response = await fetch('/api/v1/stock-intake', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

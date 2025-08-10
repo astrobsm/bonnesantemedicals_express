@@ -1,14 +1,16 @@
 import React, { useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Sidebar.css';
 import './Sidebar.responsive.css';
 
-const Sidebar = () => {
+const Sidebar = ({ userRole = 'user' }) => {
     const [sidebarOpen, setSidebarOpen] = React.useState(false);
+    const [expandedSections, setExpandedSections] = React.useState({});
     const sidebarRef = useRef(null);
     const firstLinkRef = useRef(null);
     const sidebarToggleRef = useRef(null);
     const navigate = useNavigate();
+    const location = useLocation();
 
     // Toggle sidebar and body class
     useEffect(() => {
@@ -56,7 +58,8 @@ const Sidebar = () => {
     // Logout logic
     const handleLogout = () => {
         localStorage.removeItem('token');
-        // Optionally clear other user/session data here
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userName');
         navigate('/login');
     };
 
@@ -67,6 +70,119 @@ const Sidebar = () => {
         }
         setSidebarOpen(!sidebarOpen);
     };
+
+    const toggleSection = (section) => {
+        setExpandedSections(prev => ({
+            ...prev,
+            [section]: !prev[section]
+        }));
+    };
+
+    const isActive = (path) => location.pathname === path;
+
+    const navigationSections = [
+        {
+            id: 'dashboard',
+            title: 'Dashboard',
+            icon: '🏠',
+            items: [
+                { path: '/dashboard', label: 'Main Dashboard', icon: '📊' },
+                { path: '/admin-dashboard', label: 'Admin Dashboard', icon: '👨‍💼', role: 'admin' }
+            ]
+        },
+        {
+            id: 'inventory',
+            title: 'Inventory Management',
+            icon: '📦',
+            items: [
+                { path: '/sales-inventory', label: 'Sales Inventory', icon: '💰' },
+                { path: '/production-inventory', label: 'Production Inventory', icon: '🏭' },
+                { path: '/factory-inventory', label: 'Factory Inventory', icon: '🏗️' },
+                { path: '/admin/inventory', label: 'Inventory Admin', icon: '⚙️', role: 'admin' }
+            ]
+        },
+        {
+            id: 'production',
+            title: 'Production',
+            icon: '🏭',
+            items: [
+                { path: '/raw-material-stock-intake', label: 'Raw Material Intake', icon: '📥' },
+                { path: '/raw-material-stock-level', label: 'Raw Material Levels', icon: '📈' },
+                { path: '/production-console', label: 'Production Console', icon: '🎛️' },
+                { path: '/production-output', label: 'Production Output', icon: '📤' },
+                { path: '/production-analysis', label: 'Production Analysis', icon: '📊' }
+            ]
+        },
+        {
+            id: 'staff',
+            title: 'Staff Management',
+            icon: '👥',
+            items: [
+                { path: '/staff-management', label: 'Staff Management', icon: '👨‍💼' },
+                { path: '/staff-list', label: 'Staff Directory', icon: '📋' },
+                { path: '/staff-appraisal', label: 'Staff Appraisal', icon: '⭐' },
+                { path: '/staff-performance', label: 'Performance Monitor', icon: '📈' }
+            ]
+        },
+        {
+            id: 'payroll',
+            title: 'Payroll & Finance',
+            icon: '💰',
+            items: [
+                { path: '/payroll', label: 'Payroll Management', icon: '💵' },
+                { path: '/salary-calculation', label: 'Salary Calculator', icon: '🧮' },
+                { path: '/salary-console', label: 'Salary Console', icon: '💻' },
+                { path: '/salary-records', label: 'Salary Records', icon: '📊' },
+                { path: '/salary-report', label: 'Salary Reports', icon: '📈' }
+            ]
+        },
+        {
+            id: 'attendance',
+            title: 'Attendance',
+            icon: '⏰',
+            items: [
+                { path: '/attendance', label: 'Attendance System', icon: '📅' },
+                { path: '/timed-attendance', label: 'Timed Attendance', icon: '⏱️' },
+                { path: '/attendance-record', label: 'Attendance Records', icon: '📝' },
+                { path: '/attendance-analysis', label: 'Attendance Analysis', icon: '📊' }
+            ]
+        },
+        {
+            id: 'sales',
+            title: 'Sales & Customers',
+            icon: '🛒',
+            items: [
+                { path: '/sales-summary', label: 'Sales Summary', icon: '📈' },
+                { path: '/customer-performance', label: 'Customer Performance', icon: '👥' },
+                { path: '/generate-invoice', label: 'Generate Invoice', icon: '🧾' },
+                { path: '/create-invoice', label: 'Create Invoice', icon: '📄' },
+                { path: '/admin/customers', label: 'Customer Management', icon: '👨‍💼', role: 'admin' }
+            ]
+        },
+        {
+            id: 'admin',
+            title: 'Administration',
+            icon: '⚙️',
+            role: 'admin',
+            items: [
+                { path: '/admin/users', label: 'User Management', icon: '👤' },
+                { path: '/admin/user-approvals', label: 'User Approvals', icon: '✅' },
+                { path: '/admin/suppliers', label: 'Supplier Management', icon: '🏢' },
+                { path: '/admin/reports', label: 'Admin Reports', icon: '📊' },
+                { path: '/admin/settings', label: 'System Settings', icon: '⚙️' }
+            ]
+        },
+        {
+            id: 'reports',
+            title: 'Reports & Analytics',
+            icon: '📊',
+            items: [
+                { path: '/reports-analysis', label: 'Reports Analysis', icon: '📈' },
+                { path: '/customers-performance', label: 'Customer Analytics', icon: '📊' },
+                { path: '/database-table', label: 'Database Explorer', icon: '🗃️' }
+            ]
+        }
+    ];
 
     return (
         <>
@@ -92,26 +208,85 @@ const Sidebar = () => {
                 {...(!sidebarOpen ? { inert: "" } : {})}
             >
                 <div className="sidebar-header">
+                    <div className="sidebar-logo">
+                        <span className="logo-icon">🌟</span>
+                        <span className="logo-text">AstroBSM</span>
+                    </div>
                     <button className="logout-btn" onClick={handleLogout} tabIndex={sidebarOpen ? 0 : -1}>
+                        <span className="logout-icon">🚪</span>
                         Log Out
                     </button>
                 </div>
-                <h2>Navigation</h2>
-                <ul>
-                    <li><Link to="/dashboard" ref={firstLinkRef} tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Dashboard</Link></li>
-                    <li><Link to="/registration" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Registration</Link></li>
-                    <li><Link to="/attendance" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Attendance</Link></li>
-                    <li><Link to="/sales-inventory" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Sales Inventory</Link></li>
-                    <li><Link to="/production-inventory" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Production Inventory</Link></li>
-                    <li><Link to="/factory-inventory" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Factory Inventory</Link></li>
-                    <li><Link to="/staff-management" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Staff Management</Link></li>
-                    <li><Link to="/payroll" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Payroll</Link></li>
-                    <li><Link to="/reports-analysis" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Reports & Analysis</Link></li>
-                    <li><Link to="/settings" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Settings</Link></li>
-                    <li><Link to="/admin-dashboard" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Admin Dashboard</Link></li>
-                    <li><Link to="/admin/users" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>Manage Users</Link></li>
-                    <li><Link to="/admin/user-approvals" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle}>User Approvals</Link></li>
-                </ul>
+                
+                <div className="sidebar-nav">
+                    {navigationSections.map((section) => {
+                        // Filter sections by user role
+                        if (section.role && section.role !== userRole) return null;
+                        
+                        const visibleItems = section.items.filter(item => 
+                            !item.role || item.role === userRole
+                        );
+                        
+                        if (visibleItems.length === 0) return null;
+                        
+                        return (
+                            <div key={section.id} className="nav-section">
+                                <button 
+                                    className={`nav-section-header ${expandedSections[section.id] ? 'expanded' : ''}`}
+                                    onClick={() => toggleSection(section.id)}
+                                    tabIndex={sidebarOpen ? 0 : -1}
+                                >
+                                    <span className="section-icon">{section.icon}</span>
+                                    <span className="section-title">{section.title}</span>
+                                    <span className="section-arrow">
+                                        {expandedSections[section.id] ? '▼' : '▶'}
+                                    </span>
+                                </button>
+                                
+                                {expandedSections[section.id] && (
+                                    <ul className="nav-section-items">
+                                        {visibleItems.map((item, index) => (
+                                            <li key={item.path} className={isActive(item.path) ? 'active' : ''}>
+                                                <Link 
+                                                    to={item.path} 
+                                                    ref={index === 0 && section.id === 'dashboard' ? firstLinkRef : null}
+                                                    tabIndex={sidebarOpen ? 0 : -1} 
+                                                    onClick={handleSidebarToggle}
+                                                    className="nav-link"
+                                                >
+                                                    <span className="nav-icon">{item.icon}</span>
+                                                    <span className="nav-label">{item.label}</span>
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        );
+                    })}
+                    
+                    {/* Quick Access Section */}
+                    <div className="nav-section">
+                        <div className="nav-section-header">
+                            <span className="section-icon">⚡</span>
+                            <span className="section-title">Quick Access</span>
+                        </div>
+                        <ul className="nav-section-items">
+                            <li>
+                                <Link to="/registration" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle} className="nav-link">
+                                    <span className="nav-icon">📝</span>
+                                    <span className="nav-label">Registration</span>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/settings" tabIndex={sidebarOpen ? 0 : -1} onClick={handleSidebarToggle} className="nav-link">
+                                    <span className="nav-icon">⚙️</span>
+                                    <span className="nav-label">Settings</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </nav>
         </>
     );

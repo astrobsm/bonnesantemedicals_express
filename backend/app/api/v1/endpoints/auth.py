@@ -8,11 +8,18 @@ from app.services.auth_service import (
     create_user_profile,
     get_current_user as service_get_current_user,
 )  # Import the missing function
+from app.services.simulation_auth import (
+    simulate_authenticate_user,
+    simulate_create_user,
+    simulate_get_user_by_username,
+    get_simulation_credentials
+)
 from app.core.security import create_access_token, get_password_hash
 from app.db.models.user import User
 from app.utils.pdf_utils import generate_credentials_pdf
 import random
 import string
+import os
 from fastapi.responses import Response
 from fastapi.security import OAuth2PasswordBearer
 
@@ -36,24 +43,42 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
 
 @router.post("/register", response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = create_user(db, username=user.username, password=user.password, role=user.role)
-    if db_user is None:
-        raise HTTPException(status_code=400, detail="User already registered")
-    db_user.status = "pending"  # Set status to pending for new users
-    db.commit()
-    return db_user
+    # Check if we're in simulation mode
+    if os.getenv("SKIP_DATABASE") == "true":
+        print("[SIMULATION] Using simulation user creation")
+        db_user = simulate_create_user(user.username, user.password, user.role)
+        if db_user is None:
+            raise HTTPException(status_code=400, detail="User already registered")
+        # For simulation, status is already set to pending in simulate_create_user
+        return db_user
+    else:
+        print("[DATABASE] Using database user creation")
+        db_user = create_user(db, username=user.username, password=user.password, role=user.role)
+        if db_user is None:
+            raise HTTPException(status_code=400, detail="User already registered")
+        db_user.status = "pending"  # Set status to pending for new users
+        db.commit()
+        return db_user
 
 
 @router.post("/login")
 def login(user: UserCreate, db: Session = Depends(get_db)):
     print(f"Login attempt: username={user.username}, password={user.password}, role={user.role}")
-    db_user = authenticate_user(db, user.username, user.password, user.role)
+    
+    # Check if we're in simulation mode
+    if os.getenv("SKIP_DATABASE") == "true":
+        print("[SIMULATION] Using simulation authentication")
+        db_user = simulate_authenticate_user(user.username, user.password, user.role)
+    else:
+        print("[DATABASE] Using database authentication")
+        db_user = authenticate_user(db, user.username, user.password, user.role)
+    
     if not db_user:
         print("Login failed: Invalid credentials or role")
-        raise HTTPException(status_code=400, detail="Invalid credentials or role")
+        raise HTTPException(status_code=401, detail="Invalid credentials or role")
 
     # Bypass pending status check for admin users
-    if db_user.status == "pending" and db_user.role != "Admin":
+    if hasattr(db_user, 'status') and db_user.status == "pending" and db_user.role != "Admin":
         raise HTTPException(status_code=403, detail="Account approval pending. Please contact the admin.")
 
     print(f"Login successful: username={db_user.username}, role={db_user.role}")
@@ -64,6 +89,21 @@ def login(user: UserCreate, db: Session = Depends(get_db)):
     })
     return {"access_token": access_token, "token_type": "bearer"}
 
+
+@router.get("/simulation-credentials")
+def get_simulation_credentials_endpoint():
+    """
+    Get simulation mode credentials for testing (only in SKIP_DATABASE mode)
+    """
+    if os.getenv("SKIP_DATABASE") != "true":
+        raise HTTPException(status_code=404, detail="Simulation mode not enabled")
+    
+    credentials = get_simulation_credentials()
+    return {
+        "message": "Simulation credentials for testing",
+        "credentials": credentials,
+        "note": "Use these credentials to test login in simulation mode"
+    }
 
 
 @router.get("/user/me")

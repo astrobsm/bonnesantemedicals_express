@@ -65,8 +65,32 @@ def test_database_connection():
         
         # Test connection with a simple query
         with engine.connect() as connection:
-            database_url = f"{database_url}{separator}sslmode=require"
-            logger.info("🔗 Added SSL mode to connection URL")
+            result = connection.execute(text("SELECT version()"))
+            version = result.fetchone()[0]
+            
+            connection_time = time.time() - start_time
+            logger.info(f"✅ Database connected successfully in {connection_time:.2f}s")
+            logger.info(f"📊 PostgreSQL version: {version[:50]}...")
+            
+            # Test a simple query
+            result = connection.execute(text("SELECT 1 as test"))
+            test_result = result.fetchone()[0]
+            
+            if test_result == 1:
+                logger.info("✅ Database query test successful")
+                
+                # Check if database has tables
+                result = connection.execute(text("""
+                    SELECT COUNT(*) FROM information_schema.tables 
+                    WHERE table_schema = 'public'
+                """))
+                table_count = result.fetchone()[0]
+                logger.info(f"📋 Found {table_count} tables in database")
+                
+                return True
+            else:
+                logger.error("❌ Database query test failed")
+                return False
         
         engine = create_engine(
             database_url,

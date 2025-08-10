@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     }
     
     DATABASE_URL: str = Field(
-        default="postgresql://localhost:5432/astrobsm_db",
+        default="postgresql+asyncpg://username:password@hostname:port/database?sslmode=require",
         env="DATABASE_URL",
         description="PostgreSQL database connection string"
     )

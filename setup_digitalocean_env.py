@@ -22,10 +22,10 @@ def main():
     
     print("📋 Step 1: Your DigitalOcean Database Details")
     print("   You provided these connection details:")
-    print("   • Host: app-9a7fd23c-9da8-4ace-96ef-8001f6da8ed3-do-user-23752526-0.e.db.ondigitalocean.com")
+    print("   • Host: your-database-host.digitalocean.com")
     print("   • Port: 25060")
-    print("   • Username: blakvelvet-db")
-    print("   • Database: blakvelvet-db")
+    print("   • Username: your-db-username")
+    print("   • Database: your-database-name")
     print("   • SSL: Required")
     print()
     

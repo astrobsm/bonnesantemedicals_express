@@ -11,3 +11,6 @@ pydantic==2.5.2
 email-validator==2.1.1
 pydantic-settings==2.1.0
 reportlab==4.0.8
+requests
+pywin32==306
+asyncpg==0.29.0
