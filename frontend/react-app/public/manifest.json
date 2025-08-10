@@ -1,0 +1,16 @@
+{
+  "short_name": "AstroBSM",
+  "name": "AstroBSM ERP",
+  "icons": [
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1976d2",
+  "description": "AstroBSM ERP Progressive Web App"
+}
