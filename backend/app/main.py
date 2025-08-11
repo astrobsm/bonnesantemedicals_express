@@ -120,18 +120,26 @@ async def create_default_admin():
 # Add FastAPI startup event to run migrations and create default admin
 @app.on_event("startup")
 async def startup_event():
+    # Log available directories in the container for debugging
+    logger.info("🔍 Listing available directories in container root:")
+    for root, dirs, files in os.walk("/"):
+        logger.info(f"DIR: {root}")
+        # Optionally, log files in each directory
+        # logger.info(f"FILES: {files}")
+
     # Skip database operations if SKIP_DATABASE is set
     if os.environ.get("SKIP_DATABASE") == "true":
         logger.info("⚠️ SKIP_DATABASE is set - skipping database operations")
         logger.info("🔐 Fingerprint service will run in simulation mode")
         return
-        
+    
     logger.info("🔄 Running database migrations...")
     try:
         import subprocess
         import sys
-        # Set Alembic migration path to /app/backend for container deployment
-        migration_path = "/app/backend"
+        # Set Alembic migration path to /app/app/alembic for container deployment
+        migration_path = "/app/app/alembic"
+        logger.info(f"🔧 Attempting migration in: {migration_path}")
         result = subprocess.run([
             sys.executable, "-m", "alembic", "upgrade", "head"
         ], capture_output=True, text=True, cwd=migration_path)
@@ -141,12 +149,16 @@ async def startup_event():
             logger.error(f"❌ Migration failed: {result.stderr}")
     except Exception as e:
         logger.error(f"❌ Migration error: {e}")
-    # Now create admin user
-    from app.db.session import async_session_maker as imported_async_session_maker
-    global async_session_maker
-    if async_session_maker is None:
-        async_session_maker = imported_async_session_maker
-    await create_default_admin()
+
+    # Robust async_session_maker initialization
+    try:
+        from app.db.session import async_session_maker as imported_async_session_maker
+        global async_session_maker
+        if async_session_maker is None or not callable(async_session_maker):
+            async_session_maker = imported_async_session_maker
+        await create_default_admin()
+    except Exception as e:
+        logger.error(f"❌ async_session_maker initialization or admin creation failed: {e}")
 
 async def get_db():
     if async_session_maker is None:
