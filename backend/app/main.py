@@ -25,9 +25,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("uvicorn.error")
 from fastapi.staticfiles import StaticFiles
 
+app = FastAPI(title="AstroBSM-Oracle IVANSTAMAS")
+
 # Log startup information
 logger.info("🚀 Starting AstroBSM-Oracle IVANSTAMAS API")
 logger.info(f"📁 Current working directory: {os.getcwd()}")
+logger.info(f"🔧 FastAPI app created successfully")
 
 # Validate environment configuration
 logger.info(f"🌍 Environment: {settings.ENVIRONMENT}")
@@ -51,8 +54,6 @@ else:
 # Port validation
 port = int(os.environ.get('PORT', 8080))
 logger.info(f"🌐 Application will run on port: {port}")
-
-app = FastAPI(title="AstroBSM-Oracle IVANSTAMAS")
 
 # CORS middleware for local and production frontend
 allowed_origins = ["*"]  # Allow all origins in production for now
@@ -86,6 +87,16 @@ app.include_router(production_analysis_router, prefix="/api/v1/production_analys
 
 # Include the auth router
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
+
+# Mount static files for React frontend AFTER app creation
+static_path = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(static_path):
+    logger.info(f"📁 Static path: {static_path}")
+    logger.info(f"✅ Static path exists: {os.path.exists(static_path)}")
+    logger.info(f"📂 Static directory contents: {os.listdir(static_path)}")
+    app.mount("/static", StaticFiles(directory=static_path), name="static")
+else:
+    logger.warning(f"❌ Static path does not exist: {static_path}")
 
 # Include fingerprint router
 try:
@@ -257,35 +268,6 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content={"detail": exc.errors()})
-
-# Serve React build static files
-static_path = os.path.join(os.path.dirname(__file__), "static")
-logger.info(f"📁 Static path: {static_path}")
-logger.info(f"✅ Static path exists: {os.path.exists(static_path)}")
-if os.path.exists(static_path):
-    files = os.listdir(static_path)
-    logger.info(f"📂 Static directory contents: {files}")
-    app.mount("/static", StaticFiles(directory=static_path), name="static")
-    
-    # Serve index.html at /app for React app
-    @app.get("/app")
-    async def serve_react_app():
-        index_path = os.path.join(static_path, "index.html")
-        logger.info(f"🌐 Serving React app from: {index_path}")
-        if os.path.exists(index_path):
-            return FileResponse(index_path)
-        return {"error": "React app not found"}
-        
-    # Also serve React app at root with fallback
-    @app.get("/frontend")
-    async def serve_frontend():
-        index_path = os.path.join(static_path, "index.html")
-        if os.path.exists(index_path):
-            return FileResponse(index_path)
-        return {"error": "Frontend not found", "static_path": static_path}
-else:
-    logger.error("❌ Static directory not found!")
-    logger.error(f"❌ Expected path: {static_path}")
 
 # Serve index.html for all non-API, non-static routes (for React Router)
 from starlette.requests import Request as StarletteRequest
