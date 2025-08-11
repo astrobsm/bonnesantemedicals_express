@@ -130,9 +130,11 @@ async def startup_event():
     try:
         import subprocess
         import sys
+        # Use the correct migration path for DigitalOcean (backend directory)
+        migration_path = os.path.join(os.path.dirname(__file__), '..')
         result = subprocess.run([
             sys.executable, "-m", "alembic", "upgrade", "head"
-        ], capture_output=True, text=True, cwd="/workspace/backend")
+        ], capture_output=True, text=True, cwd=migration_path)
         if result.returncode == 0:
             logger.info("✅ Database migrations completed successfully")
         else:
@@ -143,7 +145,12 @@ async def startup_event():
     await create_default_admin()
 
 async def get_db():
-    async with async_session_maker() as db:
+    if async_session_maker is None:
+        from app.db.session import async_session_maker as imported_async_session_maker
+        session_maker = imported_async_session_maker
+    else:
+        session_maker = async_session_maker
+    async with session_maker() as db:
         yield db
 
 class LoginRequest(BaseModel):
