@@ -130,10 +130,8 @@ async def startup_event():
     try:
         import subprocess
         import sys
-        # Use the correct migration path for Alembic (backend directory relative to this file)
-        migration_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
-        if not os.path.exists(os.path.join(migration_path, 'alembic.ini')):
-            migration_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../backend'))
+        # Set Alembic migration path to /app/backend for container deployment
+        migration_path = "/app/backend"
         result = subprocess.run([
             sys.executable, "-m", "alembic", "upgrade", "head"
         ], capture_output=True, text=True, cwd=migration_path)
