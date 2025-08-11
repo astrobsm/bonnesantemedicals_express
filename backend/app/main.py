@@ -23,11 +23,11 @@ from fastapi.staticfiles import StaticFiles
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("uvicorn.error")
+from fastapi.staticfiles import StaticFiles
 
 # Log startup information
 logger.info("🚀 Starting AstroBSM-Oracle IVANSTAMAS API")
 logger.info(f"📁 Current working directory: {os.getcwd()}")
-logger.info(f"🔧 FastAPI app created successfully")
 
 # Validate environment configuration
 logger.info(f"🌍 Environment: {settings.ENVIRONMENT}")
