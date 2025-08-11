@@ -130,8 +130,10 @@ async def startup_event():
     try:
         import subprocess
         import sys
-        # Use the correct migration path for DigitalOcean (backend directory)
-        migration_path = os.path.join(os.path.dirname(__file__), '..')
+        # Use the correct migration path for Alembic (backend directory relative to this file)
+        migration_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
+        if not os.path.exists(os.path.join(migration_path, 'alembic.ini')):
+            migration_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../backend'))
         result = subprocess.run([
             sys.executable, "-m", "alembic", "upgrade", "head"
         ], capture_output=True, text=True, cwd=migration_path)
@@ -142,6 +144,10 @@ async def startup_event():
     except Exception as e:
         logger.error(f"❌ Migration error: {e}")
     # Now create admin user
+    from app.db.session import async_session_maker as imported_async_session_maker
+    global async_session_maker
+    if async_session_maker is None:
+        async_session_maker = imported_async_session_maker
     await create_default_admin()
 
 async def get_db():
