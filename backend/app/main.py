@@ -131,13 +131,6 @@ async def create_default_admin():
 # Add FastAPI startup event to run migrations and create default admin
 @app.on_event("startup")
 async def startup_event():
-    # Log available directories in the container for debugging
-    logger.info("🔍 Listing available directories in container root:")
-    for root, dirs, files in os.walk("/"):
-        logger.info(f"DIR: {root}")
-        # Optionally, log files in each directory
-        # logger.info(f"FILES: {files}")
-
     # Skip database operations if SKIP_DATABASE is set
     if os.environ.get("SKIP_DATABASE") == "true":
         logger.info("⚠️ SKIP_DATABASE is set - skipping database operations")
